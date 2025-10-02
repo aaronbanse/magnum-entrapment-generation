@@ -4,14 +4,14 @@ CC = g++
 FLAGS = -O3 -std=c++11 -D_NOSQLITE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DGCC
 
 #Paths to supporting software
-MSTOOLKITPATH = ../MSToolkit
-HARDKLORPATH = ../Hardklor
-PEPXMLPATH = ../NeoPepXMLParser
+MSTOOLKITPATH = /usr/local/src/MSToolkit
+HARDKLORPATH = /usr/local/src/hardklor
+PEPXMLPATH = /usr/local/src/NeoPepXMLParser
 
 #Do not touch these variables
 #LIBPATH = -L$(MSTOOLKITPATH) -L$(HARDKLORPATH) -L$(PEPXMLPATH)
-LIBS = -lpthread -ldl
-LIBSTATIC = $(MSTOOLKITPATH)/libmstoolkitlite.a $(HARDKLORPATH)/libhardklor.a $(PEPXMLPATH)/libneopepxmlparser.a
+LIBS = -lpthread -ldl -lz -lexpat
+LIBSTATIC = $(MSTOOLKITPATH)/libmstoolkit.a $(HARDKLORPATH)/libhardklor.a $(PEPXMLPATH)/libneopepxmlparser.a
 INCLUDE = -I$(MSTOOLKITPATH)/include -I$(HARDKLORPATH) -I$(PEPXMLPATH)
 
 

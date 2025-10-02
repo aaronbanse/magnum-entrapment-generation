@@ -22,6 +22,7 @@ limitations under the License.
 #include <cstring>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include <iostream>
 #include <exception>
