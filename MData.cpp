@@ -1185,10 +1185,12 @@ bool MData::outputResults(MDatabase& db){
         }
 
         //Determine if target or decoy
-        bool bTarget = false;
-        for (size_t b = 0; b<pep.map->size(); b++) if (db[pep.map->at(b).index].name.find(params->decoy) == string::npos) bTarget = true;
-        if (bTarget) res.decoy = false;
-        else res.decoy = true;
+        bool bDecoy = false;
+        for (size_t b = 0; b<pep.map->size(); b++) if (db[pep.map->at(b).index].name.find(params->decoyPrefix) != string::npos) bDecoy = true;
+        if (bDecoy) res.decoy = true;
+        else res.decoy = false;
+
+
 
         //proteins
         for (size_t b = 0; b<pep.map->size(); b++){

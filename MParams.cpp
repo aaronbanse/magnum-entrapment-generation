@@ -202,7 +202,8 @@ void MParams::exportDefault(string ver){
   fprintf(f, "ion_series_Z = %d              #Z-dot values are used\n", (int)def.ionSeries[5]);
   fprintf(f, "\n\n#\n# Search Space Prameters: specifies breadth of data analysis.\n#\n");
   fprintf(f, "#adduct_sites = DE         #restricts adduct mass to the specified amino acids. Use 'n' and 'c' for protein termini.\n");
-  fprintf(f, "decoy_filter = %s %d    #identifier for all decoys in the database. 0=database has decoys, 1=have Magnum generate decoys\n",def.decoy.c_str(),(int)def.buildDecoy);
+  fprintf(f, "decoy_filter = %s %d    #identifier for all decoys in the database. 0=database has decoys, 1=have Magnum generate decoys\n",def.decoyPrefix.c_str(),(int)def.buildDecoy);
+  fprintf(f, "entrapment_filter = %d      #generate entrapment sequences (shuffled targets labeled as targets). 0=no entrapments, 1=generate one entrapment per target\n",(int)def.buildEntrapment);
   //deprecated:
   //fprintf(f, "e_value_depth = %d       #robustness of e-value histogram. Larger number improves e-value estimates, but increases computation time.\n",def.eValDepth);
   fprintf(f, "min_adduct_mass = %.1lf     #lowest allowed adduct mass in Daltons.\n",def.minAdductMass);
@@ -325,10 +326,20 @@ void MParams::parse(const char* cmd) {
       warn("ERROR: bad decoy_filter parameter. Suspected use of deprecated format.", 3);
       exit(-5);
     }
-    params->decoy=values[0];
+    params->decoyPrefix=values[0];
     if (atoi(values[1].c_str()) == 0) params->buildDecoy = false;
     else params->buildDecoy = true;
     logParam("decoy_filter", values[0] + " " + values[1]);
+
+  } else if(strcmp(param,"entrapment_filter")==0){
+    if (values.size() != 2) {
+      warn("ERROR: bad entrapment_filter parameter. Expected format: entrapment_filter = prefix 1", 3);
+      exit(-5);
+    }
+    params->entrapmentPrefix=values[0];
+    if (atoi(values[1].c_str()) == 0) params->buildEntrapment = false;
+    else params->buildEntrapment = true;
+    logParam("entrapment_filter", values[0] + " " + values[1]);
 
   } else if(strcmp(param,"enzyme")==0){
     params->enzyme=values[0];

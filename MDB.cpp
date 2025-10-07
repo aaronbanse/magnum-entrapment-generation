@@ -71,7 +71,7 @@ mDB& MDatabase::operator[ ](const int& i){
 //==============================
 
 //buildDB reads in a FASTA file and stores it in memory.
-bool  MDatabase::buildDB(const char* fname, string decoyStr) {
+bool  MDatabase::buildDB(const char* fname, string decoyStr, string entrapmentStr) {
   char    str[10240];
   char*   tok;
   FILE*   f;
@@ -141,7 +141,18 @@ bool  MDatabase::buildDB(const char* fname, string decoyStr) {
 //Builds decoys on the fly from sequences in the search space. Decoys are sequences reversed in place between
 //enzyme cut points. If the sequence is palindromic, a minor attempt at creating a novel sequence is made.
 void MDatabase::buildDecoy(string decoy_label) {
+  addReversedTargets(decoy_label, true);
+}
 
+//Builds entrapments on the fly from sequences in the search space. Entrapments are sequences reversed in place between
+//enzyme cut points. If the sequence is palindromic, a minor attempt at creating a novel sequence is made.
+//Entrapments are labeled as targets later in the processing pipeline.
+void MDatabase::buildEntrapment(string entrapment_label)
+{
+  addReversedTargets(entrapment_label, false);
+}
+
+void MDatabase::addReversedTargets(string label, bool add_alter) {
   typedef struct clips {
     int start;
     int stop;
@@ -157,8 +168,6 @@ void MDatabase::buildDecoy(string decoy_label) {
 
     cut.clear();
     c.start = -1;
-    //if (vDB[i].sequence[0] == 'M')j = 1; //leave leading methionines in place
-    //else j = 0;
     for (j = 1; j < vDB[i].sequence.size(); j++) {
       if (enzyme.cutN[vDB[i].sequence[j]] || enzyme.cutC[vDB[i].sequence[j]]) {
         if (c.start > -1) { //mark the space in between
@@ -177,45 +186,43 @@ void MDatabase::buildDecoy(string decoy_label) {
 
     //reverse the sequences
     string rev;
-    mDB decoy = vDB[i];
-    decoy.name = decoy_label + alter + "_" + decoy.name;
+    mDB reversed = vDB[i];
+    reversed.name = (add_alter ? (label + alter) : "") + "_" + reversed.name;
     if (alter == '0') alter = '1';
     else alter = '0';
     for (j = 0; j < cut.size(); j++) {
       rev.clear();
 
       //adjust ends for restrictive sites
-      while (enzyme.exceptN[decoy.sequence[cut[j].start]] || enzyme.exceptC[decoy.sequence[cut[j].start]]) {
+      while (enzyme.exceptN[reversed.sequence[cut[j].start]] || enzyme.exceptC[reversed.sequence[cut[j].start]]) {
         cut[j].start++;
-        if (cut[j].start == decoy.sequence.size()) break;
+        if (cut[j].start == reversed.sequence.size()) break;
       }
-      while (enzyme.exceptN[decoy.sequence[cut[j].stop]] || enzyme.exceptC[decoy.sequence[cut[j].stop]]) {
+      while (enzyme.exceptN[reversed.sequence[cut[j].stop]] || enzyme.exceptC[reversed.sequence[cut[j].stop]]) {
         cut[j].stop--;
         if (cut[j].stop == -1) break;
       }
-      if (cut[j].start == decoy.sequence.size()) continue; //skip when out of bounds
+      if (cut[j].start == reversed.sequence.size()) continue; //skip when out of bounds
       if (cut[j].stop == -1) continue; //skip when out of bounds
       if (cut[j].stop <= cut[j].start) continue; //skip if nothing will happen
 
-
       for (size_t k = cut[j].stop; k >= cut[j].start; k--) {
-        rev += decoy.sequence[k];
+        rev += reversed.sequence[k];
         if (k == 0) break;
       }
-      if (rev.size() > 2 && rev.compare(decoy.sequence.substr(cut[j].start, (size_t)cut[j].stop - (size_t)cut[j].start + 1)) == 0) { //edge case of palindrome sequence
+      if (rev.size() > 2 && rev.compare(reversed.sequence.substr(cut[j].start, (size_t)cut[j].stop - (size_t)cut[j].start + 1)) == 0) { //edge case of palindrome sequence
         char c = rev[0];
         rev[0] = rev[rev.size() / 2];
         rev[rev.size() / 2] = c; //just swap the first and middle characters, see if that breaks up the palindrome
       }
-      decoy.sequence.replace(cut[j].start, (size_t)cut[j].stop - (size_t)cut[j].start + 1, rev);
+      reversed.sequence.replace(cut[j].start, (size_t)cut[j].stop - (size_t)cut[j].start + 1, rev);
     }
 
-    vDB.push_back(decoy);
+    vDB.push_back(reversed);
   }
 
-  cout << "  Adding Magnum-generated decoys. New Total Proteins: " << vDB.size() << endl;
+  cout << "  Adding Magnum-generated " + label + "s. New Total Proteins: " << vDB.size() << endl;
 }
-
 
 //buildPeptides creates lists of peptides to search based on the user-defined enzyme rules
 bool MDatabase::buildPeptides(double min, double max, int mis,int minP, int maxP){

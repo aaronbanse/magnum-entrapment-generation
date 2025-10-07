@@ -133,6 +133,7 @@ typedef struct mParams {
   int     topCount;
   int     truncate;
   bool    buildDecoy;
+  bool    buildEntrapment;
   bool    exportPepXML;
   bool    exportPercolator;
   bool    ionSeries[6];
@@ -150,7 +151,8 @@ typedef struct mParams {
   double  rIonThreshold;
   std::string     adductSites;
   std::string     dbFile;
-  std::string     decoy;
+  std::string     decoyPrefix;
+  std::string     entrapmentPrefix;
   std::string     enzyme;
   std::string     enzymeName;
   std::string     ext;
@@ -188,6 +190,7 @@ typedef struct mParams {
     topCount=5;
     truncate=0;
     buildDecoy=false;
+    buildEntrapment=false;
     exportPepXML=true;
     exportPercolator=false;
     ionSeries[0]=false; //a-ions
@@ -207,8 +210,9 @@ typedef struct mParams {
     minAdductMass=10.0;
     percVersion=2.04;
     ppmPrecursor=25.0;
-    rIonThreshold=10;
-    decoy="random";
+    rIonThreshold=10.0;
+    decoyPrefix="decoy";
+    entrapmentPrefix="entrapment";
     enzyme="[KR]|{P}";
     enzymeName="Trypsin";
   }

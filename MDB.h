@@ -36,8 +36,9 @@ public:
   mDB& operator[ ](const int& i);
 
   //User Functions
-  bool  buildDB       (const char* fname, std::string decoyStr);                     //Reads FASTA file and populates vDB
+  bool  buildDB       (const char* fname, std::string decoyStr, std::string entrapmentStr);                     //Reads FASTA file and populates vDB
   void  buildDecoy(std::string decoy_label);
+  void  buildEntrapment(std::string entrapment_label); //Generate entrapment sequences (shuffled targets labeled as targets) for each target sequence
   bool  buildPeptides (double min, double max, int mis, int minP, int maxP); //Make peptide list within mass boundaries and miscleavages.
   void  exportDB(std::string fName);
 
@@ -81,6 +82,9 @@ private:
 
   void addPeptide(int index, int start, int len, double mass, mPeptide& p, std::vector<mPeptide>& vP, bool bN, bool bC, char xlSites);
   bool checkAA(size_t i, size_t start, size_t n, size_t seqSize, bool& bN, bool& bC);
+
+  // for entrapment and decoy generation
+  void addReversedTargets(std::string label, bool add_alter);
 
   //Utility functions (for sorting)
   static int compareMass      (const void *p1, const void *p2);

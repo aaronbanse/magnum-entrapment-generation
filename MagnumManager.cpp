@@ -77,11 +77,12 @@ int MagnumManager::run(){
   if (!db.setEnzyme(params.enzyme.c_str())) exit(-3);
   db.setAdductSites(spec.getAdductSites());
   cout << "\n Reading FASTA database: " << params.dbFile << endl;
-  if (!db.buildDB(params.dbFile.c_str(),params.decoy)){
+  if (!db.buildDB(params.dbFile.c_str(),params.decoyPrefix,params.entrapmentPrefix)){
     cout << "  Error opening database file: " << params.dbFile << endl;
     return -1;
   }
-  if(params.buildDecoy) db.buildDecoy(params.decoy);
+  if(params.buildDecoy) db.buildDecoy(params.decoyPrefix);
+  if(params.buildEntrapment) db.buildEntrapment(params.entrapmentPrefix);
   db.buildPeptides(params.minPepMass, params.maxPepMass, params.miscleave, params.minPepLen, params.maxPepLen);
   log.setDBinfo(string(params.dbFile),db.getProteinDBSize(),db.getPeptideListSize(),db.adductPepCount);
 
