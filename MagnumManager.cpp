@@ -81,8 +81,9 @@ int MagnumManager::run(){
     cout << "  Error opening database file: " << params.dbFile << endl;
     return -1;
   }
-  if(params.buildDecoy) db.buildDecoy(params.decoyPrefix);
+  // if entrapments enabled, build entrapments first so decoys are generated off of entrapments + targets dataset
   if(params.buildEntrapment) db.buildEntrapment(params.entrapmentPrefix);
+  if(params.buildDecoy) db.buildDecoy(params.decoyPrefix);
   db.buildPeptides(params.minPepMass, params.maxPepMass, params.miscleave, params.minPepLen, params.maxPepLen);
   log.setDBinfo(string(params.dbFile),db.getProteinDBSize(),db.getPeptideListSize(),db.adductPepCount);
 

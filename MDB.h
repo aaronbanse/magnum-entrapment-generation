@@ -83,8 +83,10 @@ private:
   void addPeptide(int index, int start, int len, double mass, mPeptide& p, std::vector<mPeptide>& vP, bool bN, bool bC, char xlSites);
   bool checkAA(size_t i, size_t start, size_t n, size_t seqSize, bool& bN, bool& bC);
 
-  // for entrapment and decoy generation
+  // entrapment / decoy generation
+  // Do not use addReversedTargets for both entrapment and decoy generation as this will cause decoys to be identical to targets
   void addReversedTargets(std::string label, bool add_alter);
+  void addShuffledTargets(std::string label, bool add_alter);
 
   //Utility functions (for sorting)
   static int compareMass      (const void *p1, const void *p2);

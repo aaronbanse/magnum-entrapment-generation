@@ -141,7 +141,7 @@ bool  MDatabase::buildDB(const char* fname, string decoyStr, string entrapmentSt
 //Builds decoys on the fly from sequences in the search space. Decoys are sequences reversed in place between
 //enzyme cut points. If the sequence is palindromic, a minor attempt at creating a novel sequence is made.
 void MDatabase::buildDecoy(string decoy_label) {
-  addReversedTargets(decoy_label, true);
+  addShuffledTargets(decoy_label, true);
 }
 
 //Builds entrapments on the fly from sequences in the search space. Entrapments are sequences reversed in place between
@@ -187,7 +187,7 @@ void MDatabase::addReversedTargets(string label, bool add_alter) {
     //reverse the sequences
     string rev;
     mDB reversed = vDB[i];
-    reversed.name = (add_alter ? (label + alter) : "") + "_" + reversed.name;
+    reversed.name = (add_alter ? (label + alter) : label) + "_" + reversed.name;
     if (alter == '0') alter = '1';
     else alter = '0';
     for (j = 0; j < cut.size(); j++) {
@@ -222,6 +222,32 @@ void MDatabase::addReversedTargets(string label, bool add_alter) {
   }
 
   cout << "  Adding Magnum-generated " + label + "s. New Total Proteins: " << vDB.size() << endl;
+}
+
+void MDatabase::addShuffledTargets(string label, bool add_alter) {
+  size_t sz = vDB.size();
+  char alter = '0';
+  for (size_t i = 0; i < sz; i++) {
+    mDB shuffled = vDB[i];
+    shuffled.name = (add_alter ? (label + alter) : label) + "_" + shuffled.name;
+    if (alter == '0') alter = '1';
+    else alter = '0';
+
+    string seq = shuffled.sequence;
+    size_t n = seq.length();
+
+    // Fisher-Yates shuffle algorithm
+    for (size_t j = n - 1; j > 0; j--) {
+      // Pick a random index from 0 to j (inclusive)
+      size_t k = rand() % (j + 1);
+
+      // Swap sequence[j] with sequence[k]
+      swap(seq[j], seq[k]);
+    }
+
+    shuffled.sequence = seq;
+    vDB.push_back(shuffled);
+  }
 }
 
 //buildPeptides creates lists of peptides to search based on the user-defined enzyme rules
