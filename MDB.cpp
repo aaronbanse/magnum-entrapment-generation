@@ -142,6 +142,8 @@ bool  MDatabase::buildDB(const char* fname, string decoyStr, string entrapmentSt
 //enzyme cut points. If the sequence is palindromic, a minor attempt at creating a novel sequence is made.
 void MDatabase::buildDecoy(string decoy_label) {
   addShuffledTargets(decoy_label, true);
+
+  cout << "  Adding Magnum-generated " + decoy_label + "s. New Total Proteins: " << vDB.size() << endl;
 }
 
 //Builds entrapments on the fly from sequences in the search space. Entrapments are sequences reversed in place between
@@ -150,6 +152,8 @@ void MDatabase::buildDecoy(string decoy_label) {
 void MDatabase::buildEntrapment(string entrapment_label)
 {
   addReversedTargets(entrapment_label, false);
+
+  cout << "  Adding Magnum-generated " + entrapment_label + "s. New Total Proteins: " << vDB.size() << endl;
 }
 
 void MDatabase::addReversedTargets(string label, bool add_alter) {
@@ -220,8 +224,6 @@ void MDatabase::addReversedTargets(string label, bool add_alter) {
 
     vDB.push_back(reversed);
   }
-
-  cout << "  Adding Magnum-generated " + label + "s. New Total Proteins: " << vDB.size() << endl;
 }
 
 void MDatabase::addShuffledTargets(string label, bool add_alter) {
