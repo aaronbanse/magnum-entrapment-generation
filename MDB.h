@@ -85,8 +85,8 @@ private:
 
   // entrapment / decoy generation
   // Do not use addReversedTargets for both entrapment and decoy generation as this will cause decoys to be identical to targets
-  void addReversedTargets(std::string label, bool add_alter);
-  void addShuffledTargets(std::string label, bool add_alter);
+  void addReversedTargets(std::string label);
+  void addShuffledTargets(std::string label);
 
   //Utility functions (for sorting)
   static int compareMass      (const void *p1, const void *p2);

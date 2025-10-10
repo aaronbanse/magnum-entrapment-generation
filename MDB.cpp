@@ -141,7 +141,7 @@ bool  MDatabase::buildDB(const char* fname, string decoyStr, string entrapmentSt
 //Builds decoys on the fly from sequences in the search space. Decoys are sequences reversed in place between
 //enzyme cut points. If the sequence is palindromic, a minor attempt at creating a novel sequence is made.
 void MDatabase::buildDecoy(string decoy_label) {
-  addShuffledTargets(decoy_label, true);
+  addShuffledTargets(decoy_label);
 
   cout << "  Adding Magnum-generated " + decoy_label + "s. New Total Proteins: " << vDB.size() << endl;
 }
@@ -151,12 +151,12 @@ void MDatabase::buildDecoy(string decoy_label) {
 //Entrapments are labeled as targets later in the processing pipeline.
 void MDatabase::buildEntrapment(string entrapment_label)
 {
-  addReversedTargets(entrapment_label, false);
+  addReversedTargets(entrapment_label);
 
   cout << "  Adding Magnum-generated " + entrapment_label + "s. New Total Proteins: " << vDB.size() << endl;
 }
 
-void MDatabase::addReversedTargets(string label, bool add_alter) {
+void MDatabase::addReversedTargets(string label) {
   typedef struct clips {
     int start;
     int stop;
@@ -191,9 +191,7 @@ void MDatabase::addReversedTargets(string label, bool add_alter) {
     //reverse the sequences
     string rev;
     mDB reversed = vDB[i];
-    reversed.name = (add_alter ? (label + alter) : label) + "_" + reversed.name;
-    if (alter == '0') alter = '1';
-    else alter = '0';
+    reversed.name = label + "_" + reversed.name;
     for (j = 0; j < cut.size(); j++) {
       rev.clear();
 
@@ -226,15 +224,11 @@ void MDatabase::addReversedTargets(string label, bool add_alter) {
   }
 }
 
-void MDatabase::addShuffledTargets(string label, bool add_alter) {
+void MDatabase::addShuffledTargets(string label) {
   size_t sz = vDB.size();
-  char alter = '0';
   for (size_t i = 0; i < sz; i++) {
     mDB shuffled = vDB[i];
-    shuffled.name = (add_alter ? (label + alter) : label) + "_" + shuffled.name;
-    if (alter == '0') alter = '1';
-    else alter = '0';
-
+    shuffled.name = label + "_" + shuffled.name;
     string seq = shuffled.sequence;
     size_t n = seq.length();
 
